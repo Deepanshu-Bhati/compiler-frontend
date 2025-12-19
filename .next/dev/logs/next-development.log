@@ -1,0 +1,29 @@
+[00:00:01.644] Server  LOG      ✓ Ready in 1282ms
+[00:00:05.526] Server  ERROR    ⨯ ReferenceError: self is not defined
+[00:00:10.721] Browser LOG     java
+[00:00:10.721] Browser LOG     0e4f3e4a-c73d-4311-8c8b-48b1ef6d4a9e
+[00:00:10.721] Browser LOG     socket connection is live
+[00:00:11.397] Browser LOG     message received
+[00:00:14.150] Browser LOG     message received
+[00:00:15.279] Browser LOG     message received
+[00:00:16.304] Browser LOG     socket is closed
+[00:00:26.871] Server  LOG      ✓ Compiled in 19ms
+[00:00:28.008] Server  LOG      ✓ Compiled in 21ms
+[00:05:01.085] Server  LOG      ✓ Compiled in 17ms
+[00:05:04.932] Server  LOG      ✓ Compiled in 14ms
+[00:05:09.097] Server  LOG      ✓ Compiled in 17ms
+[00:05:14.305] Server  LOG      ✓ Compiled in 16ms
+[00:05:16.921] Server  LOG      ✓ Compiled in 11ms
+[00:05:18.891] Server  LOG      ✓ Compiled in 17ms
+[00:05:24.912] Server  LOG      ✓ Compiled in 48ms
+[00:05:33.937] Server  LOG      ✓ Compiled in 13ms
+[00:05:57.516] Server  LOG      ✓ Compiled in 16ms
+[00:06:07.527] Browser LOG     java
+[00:06:07.527] Browser LOG     17f0eb8e-d076-4b58-9d41-04e9b8f04f16
+[00:06:07.527] Browser LOG     socket connection is live
+[00:06:08.220] Browser LOG     message received
+[00:06:20.790] Server  LOG      ✓ Compiled in 28ms
+[00:07:31.192] Server  LOG      ✓ Compiled in 18ms
+[00:07:33.529] Server  LOG      ✓ Compiled in 16ms
+[00:07:39.927] Server  LOG      ✓ Compiled in 11ms
+[00:08:33.830] Browser LOG     socket is closed
