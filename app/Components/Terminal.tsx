@@ -34,7 +34,6 @@ export default function TerminalArea() {
     term.writeln("Connected to backend...");
     term.write("> ");
 
-    // QUEUE to sync char output
     const outputQueue: string[] = [];
     let processing = false;
 
@@ -60,7 +59,7 @@ export default function TerminalArea() {
       flushOutput();
     });
 
-    // input buffer
+    
     let buffer = "";
 
     term.onData(data => {
@@ -71,7 +70,7 @@ export default function TerminalArea() {
         return;
       }
 
-      if (data === "\u007F") { // BACKSPACE
+      if (data === "\u007F") { 
         if (buffer.length > 0) {
           buffer = buffer.slice(0, -1);
           term.write("\b \b");
@@ -84,7 +83,7 @@ export default function TerminalArea() {
     });
 
     setOnClose(() => {
-        term.write("\r\n[ connection closed ]\r\n");
+        term.write("\r\n[Program is successfully executed]\r\n");
         term.write("> ");
       });
 

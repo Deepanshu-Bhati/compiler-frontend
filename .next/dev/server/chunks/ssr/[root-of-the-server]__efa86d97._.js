@@ -38,7 +38,7 @@ function Provider({ children }) {
         if (handlers?.onOpen) socket.onopen = handlers.onOpen;
         if (handlers?.onError) socket.onerror = handlers.onError;
         socket.onmessage = (event)=>{
-            handlers?.onMessage?.(event); // backend message callback
+            handlers?.onMessage?.(event);
             messageHandlerRef.current?.(event.data); // user-defined
         };
         socket.onclose = ()=>{
@@ -320,7 +320,6 @@ function TerminalArea() {
         term.focus();
         term.writeln("Connected to backend...");
         term.write("> ");
-        // QUEUE to sync char output
         const outputQueue = [];
         let processing = false;
         const flushOutput = ()=>{
@@ -342,7 +341,6 @@ function TerminalArea() {
             outputQueue.push(data); // data is single char
             flushOutput();
         });
-        // input buffer
         let buffer = "";
         term.onData((data)=>{
             if (data === "\r") {
@@ -362,7 +360,7 @@ function TerminalArea() {
             term.write(data);
         });
         setOnClose(()=>{
-            term.write("\r\n[ connection closed ]\r\n");
+            term.write("\r\n[Program is successfully executed]\r\n");
             term.write("> ");
         });
         const handleInput = (input)=>{
@@ -400,7 +398,7 @@ function TerminalArea() {
         className: "h-full w-full bg-black rounded text-gray-100"
     }, void 0, false, {
         fileName: "[project]/Project1/compiler/app/Components/Terminal.tsx",
-        lineNumber: 123,
+        lineNumber: 122,
         columnNumber: 5
     }, this);
 }
@@ -455,10 +453,10 @@ function Code() {
         const id = res.data;
         const wsUrl = base.replace("http", "ws") + `ws/compile?id=${id}`;
         connect(wsUrl, {
-            onOpen: ()=>console.log("socket connection is live"),
-            onMessage: (m)=>console.log(m.data),
-            onClose: ()=>console.log(""),
-            onError: ()=>console.log("")
+            onOpen: ()=>{},
+            onMessage: (m)=>{},
+            onClose: ()=>{},
+            onError: ()=>{}
         });
     };
     const lineCount = code.split("\n").length;

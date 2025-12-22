@@ -49,7 +49,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     if (handlers?.onError) socket.onerror = handlers.onError;
 
     socket.onmessage = (event) => {
-      handlers?.onMessage?.(event);  // backend message callback
+      handlers?.onMessage?.(event);  
       messageHandlerRef.current?.(event.data); // user-defined
     };
 

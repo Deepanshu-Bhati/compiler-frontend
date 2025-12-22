@@ -41,10 +41,10 @@ export default function Code() {
           const id=res.data;
           const wsUrl = base.replace("http", "ws")+`ws/compile?id=${id}`;
           connect(wsUrl,{
-            onOpen:()=>console.log("socket connection is live"),
-            onMessage:(m)=>console.log(m.data),
-            onClose:()=>console.log(""),
-            onError:()=>console.log("")
+            onOpen:()=>{},
+            onMessage:(m)=>{},
+            onClose:()=>{},
+            onError:()=>{}
           })
         }
     
