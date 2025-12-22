@@ -28,7 +28,6 @@
 
 @layer theme {
   :root, :host {
-    --color-amber-50: #fffbeb;
     --color-amber-100: #fef3c6;
     --color-yellow-300: #ffe02a;
     --color-yellow-400: #fac800;
@@ -71,7 +70,6 @@
 
   @supports (color: lab(0% 0 0)) {
     :root, :host {
-      --color-amber-50: lab(98.6252% -.635922 8.42309);
       --color-amber-100: lab(95.916% -1.21653 23.111);
       --color-yellow-300: lab(89.7033% -.480294 84.4917);
       --color-yellow-400: lab(83.2664% 8.65132 106.895);
@@ -382,10 +380,6 @@
     height: 100vh;
   }
 
-  .min-h-full {
-    min-height: 100%;
-  }
-
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
@@ -420,6 +414,10 @@
 
   .overflow-auto {
     overflow: auto;
+  }
+
+  .rounded {
+    border-radius: .25rem;
   }
 
   .rounded-full {
@@ -594,10 +592,6 @@
     letter-spacing: var(--tracking-wide);
   }
 
-  .text-amber-50 {
-    color: var(--color-amber-50);
-  }
-
   .text-amber-100 {
     color: var(--color-amber-100);
   }
@@ -608,6 +602,10 @@
 
   .text-blue-400 {
     color: var(--color-blue-400);
+  }
+
+  .text-gray-100 {
+    color: var(--color-gray-100);
   }
 
   .text-gray-400 {

@@ -1,98 +1,125 @@
-"use client"    
-import { useRef ,useEffect} from "react"
+"use client";
+
+import { useRef, useEffect } from "react";
 import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 import { useHook } from "./hooks";
-// import "xterm/css/xterm.css";
-// import { send } from "process";
+import "xterm/css/xterm.css";
 
+export default function TerminalArea() {
+  const termRef = useRef<HTMLDivElement | null>(null);
+  const terminalRef = useRef<Terminal | null>(null);
+  const { setOnMessage, setOnClose,send } = useHook();
 
-export function Clean(){
+  useEffect(() => {
+    if (!termRef.current) return;
 
+    const fitAddon = new FitAddon();
+    const term = new Terminal({
+      cursorBlink: true,
+      fontSize: 14,
+      theme: {
+        background: "#000000",
+        foreground: "#00ff00",
+      },
+      scrollback: 2000,
+    });
+
+    terminalRef.current = term;
+    term.loadAddon(fitAddon);
+    term.open(termRef.current);
+    fitAddon.fit();
+    term.focus();
+
+    term.writeln("Connected to backend...");
+    term.write("> ");
+
+    // QUEUE to sync char output
+    const outputQueue: string[] = [];
+    let processing = false;
+
+    const flushOutput = () => {
+      if (processing) return;
+      processing = true;
+
+      (async function loop() {
+        while (outputQueue.length > 0) {
+          const ch = outputQueue.shift();
+          if (ch) {
+            term.write(ch);
+            await new Promise(r => setTimeout(r, 1)); // prevents UI lag
+          }
+        }
+        processing = false;
+      })();
+    };
+
+    // backend message handler
+    setOnMessage((data: string) => {
+      outputQueue.push(data); // data is single char
+      flushOutput();
+    });
+
+    // input buffer
+    let buffer = "";
+
+    term.onData(data => {
+      if (data === "\r") {
+        handleInput(buffer.trim());
+        buffer = "";
+        term.write("\r\n> ");
+        return;
+      }
+
+      if (data === "\u007F") { // BACKSPACE
+        if (buffer.length > 0) {
+          buffer = buffer.slice(0, -1);
+          term.write("\b \b");
+        }
+        return;
+      }
+
+      buffer += data;
+      term.write(data);
+    });
+
+    setOnClose(() => {
+        term.write("\r\n[ connection closed ]\r\n");
+        term.write("> ");
+      });
+
+    const handleInput = (input: string) => {
+      if (!input.length) return;
+
+      if (input === "clear") {
+        term.clear();
+        return;
+      }
+
+      let payload;
+
+      if (/^".*"$/.test(input)) {
+        payload = { type: "string", value: input.slice(1, -1) };
+      } 
+      else if (/^-?\d+$/.test(input)) {
+        payload = { type: "number", value: Number(input) };
+      }
+      else {
+        payload = { type: "string", value: input };
+      }
+
+      send(JSON.stringify(payload));
+    };
+
+    return () => {
+
+      term.dispose();
+      terminalRef.current = null;
+    };
+
+  }, []);
+
+  return (
+    <div ref={termRef} className="h-full w-full bg-black rounded text-gray-100" />
+  );
 }
-
-export default function TerminalArea(){
-    const termref=useRef<HTMLDivElement | null>(null);
-    const terminal=useRef<Terminal | null>(null);
-    const{setOnMessage,send} =useHook();
-    useEffect(()=>{
-        if(!termref.current) return;
-        const term=new Terminal({
-            cursorBlink:true,
-            fontSize:14,
-            theme:{
-                background:"#000000",
-                foreground:"#00ff00"
-            }
-        })
-        const fitAddon=new FitAddon();
-        term.loadAddon(fitAddon);
-        term.open(termref.current);
-        fitAddon.fit();
-        term.focus()
-        term.writeln("connected  to backend ");
-        setOnMessage((data)=>{
-            term.write(data)
-            term.reset()
-            term.write("\n")
-        })
-        let buffer ="";
-        term.onData((data) => {
-
-
-            if (data === '\r' || data === ' ') {
-                const trimmed = buffer.trim();
-                if (data === '\r') {
-                
-                    if (trimmed === "clear") {
-                        term.reset();
-                        buffer = "";
-                        return;
-                    }
-                
-                    
-                }
-                let payload;
-        
-                if (/^".*"$/.test(trimmed)) {  
-                    payload = { type: "string", value: trimmed.slice(1, -1) };
-                } 
-                else if (/^-?\d+$/.test(trimmed)) { 
-                    payload = { type: "number", value: Number(trimmed) };
-                } 
-                else {
-                    payload = { type: "string", value: trimmed };
-                }
-        
-                send(JSON.stringify(payload));  
-                term.write(data === '\r' ? "\r\n" : " ");  
-                buffer = "";
-                return;
-            }
-        
-            buffer += data;
-            term.write(data);
-        });
-        
-          
-        terminal.current=term;
-        return ()=>{
-            buffer = "";
-
-            
-            if (terminal.current) {
-                terminal.current.reset();  
-                terminal.current.dispose();
-                terminal.current = null; 
-
-            }
-
-           
-
-        }       
-
-    },[])    
-    return(<>
-    <div ref={termref} className="h-full w-full bg-black text-amber-50"></div>
-    </>)
-}   

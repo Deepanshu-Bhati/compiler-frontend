@@ -27,20 +27,26 @@ export default function Code() {
 
   const compile=async ()=>{
 
-    console.log(lang);
-    let res=await axios.post("http://localhost:8080/compile" ,{
-      language:lang,code:code
-    })
-    console.log(res.data);
-    const id=res.data;
-    connect(`ws://localhost:8080/ws/compile?id=${id}`,{
-      onOpen:()=>console.log("socket connection is live"),
-
-      onMessage:(m)=>console.log(m.data),
-      onClose:()=>console.log("socket is closed"),
-      onError:()=>console.log(" there is some error in the code")
-    })
-  }
+    const base=process.env.NEXT_PUBLIC_BACKEND_URL
+      if(!base) return;
+      
+        
+        let res = await axios.post(`${base}compile`, {
+          language: lang,
+          code: code
+        }, {
+          headers: { "Content-Type": "application/json" }
+        })
+        
+          const id=res.data;
+          const wsUrl = base.replace("http", "ws")+`ws/compile?id=${id}`;
+          connect(wsUrl,{
+            onOpen:()=>console.log("socket connection is live"),
+            onMessage:(m)=>console.log(m.data),
+            onClose:()=>console.log(""),
+            onError:()=>console.log("")
+          })
+        }
     
     
     

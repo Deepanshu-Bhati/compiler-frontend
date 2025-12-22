@@ -29,32 +29,27 @@ const WebSocketContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$pr
 function Provider({ children }) {
     const [theme, setTheme] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])("light");
     const socketRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const messageHandlerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const closeHandlerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null); // << added ref
+    const messageHandlerref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const connect = (url, handlers)=>{
-        if (socketRef.current) socketRef.current.close();
+        if (socketRef.current) {
+            socketRef.current.close();
+        }
         const socket = new WebSocket(url);
-        // system handlers
         if (handlers?.onOpen) socket.onopen = handlers.onOpen;
+        if (handlers?.onMessage) socket.onmessage = handlers.onMessage;
+        if (handlers?.onClose) socket.onclose = handlers.onClose;
         if (handlers?.onError) socket.onerror = handlers.onError;
         socket.onmessage = (event)=>{
-            handlers?.onMessage?.(event); // backend message callback
-            messageHandlerRef.current?.(event.data); // user-defined
-        };
-        socket.onclose = ()=>{
-            handlers?.onClose?.(); // user passed to connect()
-            closeHandlerRef.current?.(); // setOnClose listener
+            console.log("message received");
+            messageHandlerref.current?.(event.data);
         };
         socketRef.current = socket;
     };
     const setOnMessage = (handler)=>{
-        messageHandlerRef.current = handler;
-    };
-    const setOnClose = (handler)=>{
-        closeHandlerRef.current = handler;
+        messageHandlerref.current = handler;
     };
     const send = (data)=>{
-        if (socketRef.current?.readyState === WebSocket.OPEN) {
+        if (socketRef.current?.readyState == WebSocket.OPEN) {
             socketRef.current.send(data);
         }
     };
@@ -68,7 +63,6 @@ function Provider({ children }) {
             send,
             connect,
             setOnMessage,
-            setOnClose,
             disconnect
         },
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(ThemeContext.Provider, {
@@ -79,12 +73,12 @@ function Provider({ children }) {
             children: children
         }, void 0, false, {
             fileName: "[project]/Project1/compiler/app/Provider.tsx",
-            lineNumber: 94,
-            columnNumber: 7
+            lineNumber: 87,
+            columnNumber: 5
         }, this)
     }, void 0, false, {
         fileName: "[project]/Project1/compiler/app/Provider.tsx",
-        lineNumber: 84,
+        lineNumber: 86,
         columnNumber: 5
     }, this);
 }
@@ -278,10 +272,43 @@ const mod = __turbopack_context__.x("events", () => require("events"));
 
 module.exports = mod;
 }),
+"[project]/Project1/compiler/app/Components/asyncQueue.js [app-ssr] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "AsyncQueue",
+    ()=>AsyncQueue
+]);
+class AsyncQueue {
+    constructor(){
+        this.queue = [];
+        this.processing = false;
+    }
+    enqueue(task) {
+        this.queue.push(task);
+        this.#process();
+    }
+    async #process() {
+        if (this.processing) return;
+        this.processing = true;
+        while(this.queue.length){
+            const task = this.queue.shift();
+            try {
+                await task(); // wait before next task
+            } catch (err) {
+                console.error("Queue task failed:", err);
+            }
+        }
+        this.processing = false;
+    }
+}
+}),
 "[project]/Project1/compiler/app/Components/Terminal.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
 __turbopack_context__.s([
+    "Clean",
+    ()=>Clean,
     "default",
     ()=>TerminalArea
 ]);
@@ -290,6 +317,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2f$lib$2f$xterm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/xterm/lib/xterm.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2d$addon$2d$fit$2f$lib$2f$xterm$2d$addon$2d$fit$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$hooks$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/app/Components/hooks.tsx [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$asyncQueue$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/app/Components/asyncQueue.js [app-ssr] (ecmascript)");
 "use client";
 ;
 ;
@@ -297,112 +325,90 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$
 ;
 ;
 ;
+function Clean() {}
 function TerminalArea() {
-    const termRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const terminalRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const { setOnMessage, setOnClose, send } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$hooks$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useHook"])();
+    const termref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const terminal = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const queueRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$asyncQueue$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["AsyncQueue"]());
+    const { setOnMessage, send } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$hooks$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useHook"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (!termRef.current) return;
-        const fitAddon = new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2d$addon$2d$fit$2f$lib$2f$xterm$2d$addon$2d$fit$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FitAddon"]();
+        if (!termref.current) return;
         const term = new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2f$lib$2f$xterm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Terminal"]({
             cursorBlink: true,
             fontSize: 14,
             theme: {
                 background: "#000000",
                 foreground: "#00ff00"
-            },
-            scrollback: 2000
+            }
         });
-        terminalRef.current = term;
+        const fitAddon = new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2d$addon$2d$fit$2f$lib$2f$xterm$2d$addon$2d$fit$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FitAddon"]();
         term.loadAddon(fitAddon);
-        term.open(termRef.current);
+        term.open(termref.current);
         fitAddon.fit();
         term.focus();
-        term.writeln("Connected to backend...");
-        term.write("> ");
-        // QUEUE to sync char output
-        const outputQueue = [];
-        let processing = false;
-        const flushOutput = ()=>{
-            if (processing) return;
-            processing = true;
-            (async function loop() {
-                while(outputQueue.length > 0){
-                    const ch = outputQueue.shift();
-                    if (ch) {
-                        term.write(ch);
-                        await new Promise((r)=>setTimeout(r, 1)); // prevents UI lag
-                    }
-                }
-                processing = false;
-            })();
-        };
-        // backend message handler
+        term.writeln("connected  to backend ");
         setOnMessage((data)=>{
-            outputQueue.push(data); // data is single char
-            flushOutput();
+            queueRef.current.enqueue(async ()=>{
+                await new Promise((res)=>setTimeout(res, 5));
+                term.write(data + "\r\n");
+            });
         });
-        // input buffer
         let buffer = "";
         term.onData((data)=>{
-            if (data === "\r") {
-                handleInput(buffer.trim());
-                buffer = "";
-                term.write("\r\n> ");
-                return;
-            }
-            if (data === "\u007F") {
-                if (buffer.length > 0) {
-                    buffer = buffer.slice(0, -1);
-                    term.write("\b \b");
+            if (data === '\r' || data === ' ') {
+                const trimmed = buffer.trim();
+                if (data === '\r') {
+                    if (trimmed === "clear") {
+                        term.reset();
+                        buffer = "";
+                        return;
+                    }
                 }
+                let payload;
+                if (/^".*"$/.test(trimmed)) {
+                    payload = {
+                        type: "string",
+                        value: trimmed.slice(1, -1)
+                    };
+                } else if (/^-?\d+$/.test(trimmed)) {
+                    payload = {
+                        type: "number",
+                        value: Number(trimmed)
+                    };
+                } else {
+                    payload = {
+                        type: "string",
+                        value: trimmed
+                    };
+                }
+                send(JSON.stringify(payload));
+                term.write(data === '\r' ? "\r\n" : " ");
+                buffer = "";
                 return;
             }
             buffer += data;
             term.write(data);
         });
-        setOnClose(()=>{
-            term.write("\r\n[ connection closed ]\r\n");
-            term.write("> ");
-        });
-        const handleInput = (input)=>{
-            if (!input.length) return;
-            if (input === "clear") {
-                term.clear();
-                return;
-            }
-            let payload;
-            if (/^".*"$/.test(input)) {
-                payload = {
-                    type: "string",
-                    value: input.slice(1, -1)
-                };
-            } else if (/^-?\d+$/.test(input)) {
-                payload = {
-                    type: "number",
-                    value: Number(input)
-                };
-            } else {
-                payload = {
-                    type: "string",
-                    value: input
-                };
-            }
-            send(JSON.stringify(payload));
-        };
+        terminal.current = term;
         return ()=>{
-            term.dispose();
-            terminalRef.current = null;
+            buffer = "";
+            if (terminal.current) {
+                terminal.current.reset();
+                terminal.current.dispose();
+                terminal.current = null;
+            }
         };
     }, []);
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        ref: termRef,
-        className: "h-full w-full bg-black rounded text-gray-100"
-    }, void 0, false, {
-        fileName: "[project]/Project1/compiler/app/Components/Terminal.tsx",
-        lineNumber: 123,
-        columnNumber: 5
-    }, this);
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            ref: termref,
+            className: "h-full w-full bg-black text-amber-50"
+        }, void 0, false, {
+            fileName: "[project]/Project1/compiler/app/Components/Terminal.tsx",
+            lineNumber: 100,
+            columnNumber: 5
+        }, this)
+    }, void 0, false);
 }
 }),
 "[project]/Project1/compiler/app/Components/Code.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {
@@ -615,4 +621,4 @@ function Code() {
 }),
 ];
 
-//# sourceMappingURL=%5Broot-of-the-server%5D__efa86d97._.js.map
+//# sourceMappingURL=%5Broot-of-the-server%5D__da760dae._.js.map

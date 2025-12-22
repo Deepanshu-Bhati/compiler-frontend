@@ -6,7 +6,8 @@
   "static/chunks/12b81_axios_lib_4e24144b._.js",
   "static/chunks/12b81_xterm_lib_xterm_5e57d3e9.js",
   "static/chunks/12b81_756d7bbe._.js",
-  "static/chunks/Project1_compiler_app_f0671f5e._.js"
+  "static/chunks/Project1_compiler_app_f0671f5e._.js",
+  "static/chunks/12b81_xterm_css_xterm_ecfd5990.css"
 ],
     source: "dynamic"
 });
