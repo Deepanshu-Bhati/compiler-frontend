@@ -287,86 +287,90 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2f$lib$2f$xterm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/xterm/lib/xterm.js [app-ssr] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2d$addon$2d$fit$2f$lib$2f$xterm$2d$addon$2d$fit$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$hooks$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Project1/compiler/app/Components/hooks.tsx [app-ssr] (ecmascript)");
 "use client";
 ;
 ;
 ;
 ;
-;
-;
 function TerminalArea() {
-    const termRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const containerRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const terminalRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const { setOnMessage, setOnClose, send } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$app$2f$Components$2f$hooks$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useHook"])();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (!termRef.current) return;
-        const fitAddon = new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2d$addon$2d$fit$2f$lib$2f$xterm$2d$addon$2d$fit$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["FitAddon"]();
-        const term = new __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$xterm$2f$lib$2f$xterm$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Terminal"]({
-            cursorBlink: true,
-            fontSize: 14,
-            theme: {
-                background: "#000000",
-                foreground: "#00ff00"
-            },
-            scrollback: 2000
-        });
-        terminalRef.current = term;
-        term.loadAddon(fitAddon);
-        term.open(termRef.current);
-        fitAddon.fit();
-        term.focus();
-        term.writeln("Connected to backend...");
-        term.write("> ");
-        const outputQueue = [];
-        let processing = false;
-        const flushOutput = ()=>{
-            if (processing) return;
-            processing = true;
-            (async function loop() {
-                while(outputQueue.length > 0){
-                    const ch = outputQueue.shift();
-                    if (ch) {
-                        term.write(ch);
-                        await new Promise((r)=>setTimeout(r, 1)); // prevents UI lag
-                    }
+        let disposed = false;
+        const initTerminal = async ()=>{
+            if (!containerRef.current) return;
+            // ✅ dynamic imports (prevents `self is not defined`)
+            const { Terminal } = await __turbopack_context__.A("[project]/Project1/compiler/node_modules/xterm/lib/xterm.js [app-ssr] (ecmascript, async loader)");
+            const { FitAddon } = await __turbopack_context__.A("[project]/Project1/compiler/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js [app-ssr] (ecmascript, async loader)");
+            if (disposed) return;
+            const fitAddon = new FitAddon();
+            const terminal = new Terminal({
+                cursorBlink: true,
+                fontSize: 14,
+                scrollback: 2000,
+                theme: {
+                    background: "#000000",
+                    foreground: "#00ff00"
                 }
-                processing = false;
-            })();
+            });
+            terminalRef.current = terminal;
+            terminal.loadAddon(fitAddon);
+            terminal.open(containerRef.current);
+            fitAddon.fit();
+            terminal.focus();
+            terminal.writeln("Connected to backend...");
+            terminal.write("> ");
+            selfHandleOutput(terminal);
+            selfHandleInput(terminal);
         };
-        // backend message handler
-        setOnMessage((data)=>{
-            outputQueue.push(data); // data is single char
-            flushOutput();
-        });
-        let buffer = "";
-        term.onData((data)=>{
-            if (data === "\r") {
-                handleInput(buffer.trim());
-                buffer = "";
-                term.write("\r\n> ");
-                return;
-            }
-            if (data === "\u007F") {
-                if (buffer.length > 0) {
-                    buffer = buffer.slice(0, -1);
-                    term.write("\b \b");
+        /** ---------- SELF: OUTPUT HANDLER ---------- */ const selfHandleOutput = (terminal)=>{
+            const queue = [];
+            let running = false;
+            const flush = async ()=>{
+                if (running) return;
+                running = true;
+                while(queue.length > 0){
+                    terminal.write(queue.shift());
+                    await new Promise((r)=>setTimeout(r, 1));
                 }
-                return;
-            }
-            buffer += data;
-            term.write(data);
-        });
-        setOnClose(()=>{
-            term.write("\r\n[Program is successfully executed]\r\n");
-            term.write("> ");
-        });
-        const handleInput = (input)=>{
-            if (!input.length) return;
+                running = false;
+            };
+            setOnMessage((data)=>{
+                queue.push(data);
+                flush();
+            });
+            setOnClose(()=>{
+                terminal.write("\r\n[Program executed successfully]\r\n> ");
+            });
+        };
+        /** ---------- SELF: INPUT HANDLER ---------- */ const selfHandleInput = (terminal)=>{
+            let buffer = "";
+            terminal.onData((data)=>{
+                // ENTER
+                if (data === "\r") {
+                    selfSend(buffer.trim(), terminal);
+                    buffer = "";
+                    terminal.write("\r\n> ");
+                    return;
+                }
+                // BACKSPACE
+                if (data === "\u007F") {
+                    if (buffer.length) {
+                        buffer = buffer.slice(0, -1);
+                        terminal.write("\b \b");
+                    }
+                    return;
+                }
+                buffer += data;
+                terminal.write(data);
+            });
+        };
+        /** ---------- SELF: SEND LOGIC ---------- */ const selfSend = (input, terminal)=>{
+            if (!input) return;
             if (input === "clear") {
-                term.clear();
+                terminal.clear();
                 return;
             }
             let payload;
@@ -388,17 +392,19 @@ function TerminalArea() {
             }
             send(JSON.stringify(payload));
         };
+        initTerminal();
         return ()=>{
-            term.dispose();
+            disposed = true;
+            terminalRef.current?.dispose();
             terminalRef.current = null;
         };
     }, []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Project1$2f$compiler$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        ref: termRef,
+        ref: containerRef,
         className: "h-full w-full bg-black rounded text-gray-100"
     }, void 0, false, {
         fileName: "[project]/Project1/compiler/app/Components/Terminal.tsx",
-        lineNumber: 122,
+        lineNumber: 137,
         columnNumber: 5
     }, this);
 }

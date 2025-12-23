@@ -1,97 +1,113 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
 import { useHook } from "./hooks";
 import "xterm/css/xterm.css";
 
 export default function TerminalArea() {
-  const termRef = useRef<HTMLDivElement | null>(null);
-  const terminalRef = useRef<Terminal | null>(null);
-  const { setOnMessage, setOnClose,send } = useHook();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const terminalRef = useRef<any>(null);
+
+  const { setOnMessage, setOnClose, send } = useHook();
 
   useEffect(() => {
-    if (!termRef.current) return;
+    let disposed = false;
 
-    const fitAddon = new FitAddon();
-    const term = new Terminal({
-      cursorBlink: true,
-      fontSize: 14,
-      theme: {
-        background: "#000000",
-        foreground: "#00ff00",
-      },
-      scrollback: 2000,
-    });
+    const initTerminal = async () => {
+      if (!containerRef.current) return;
 
-    terminalRef.current = term;
-    term.loadAddon(fitAddon);
-    term.open(termRef.current);
-    fitAddon.fit();
-    term.focus();
+      // ✅ dynamic imports (prevents `self is not defined`)
+      const { Terminal } = await import("xterm");
+      const { FitAddon } = await import("xterm-addon-fit");
 
-    term.writeln("Connected to backend...");
-    term.write("> ");
+      if (disposed) return;
 
-    const outputQueue: string[] = [];
-    let processing = false;
+      const fitAddon = new FitAddon();
 
-    const flushOutput = () => {
-      if (processing) return;
-      processing = true;
-
-      (async function loop() {
-        while (outputQueue.length > 0) {
-          const ch = outputQueue.shift();
-          if (ch) {
-            term.write(ch);
-            await new Promise(r => setTimeout(r, 1)); // prevents UI lag
-          }
-        }
-        processing = false;
-      })();
-    };
-
-    // backend message handler
-    setOnMessage((data: string) => {
-      outputQueue.push(data); // data is single char
-      flushOutput();
-    });
-
-    
-    let buffer = "";
-
-    term.onData(data => {
-      if (data === "\r") {
-        handleInput(buffer.trim());
-        buffer = "";
-        term.write("\r\n> ");
-        return;
-      }
-
-      if (data === "\u007F") { 
-        if (buffer.length > 0) {
-          buffer = buffer.slice(0, -1);
-          term.write("\b \b");
-        }
-        return;
-      }
-
-      buffer += data;
-      term.write(data);
-    });
-
-    setOnClose(() => {
-        term.write("\r\n[Program is successfully executed]\r\n");
-        term.write("> ");
+      const terminal = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        scrollback: 2000,
+        theme: {
+          background: "#000000",
+          foreground: "#00ff00",
+        },
       });
 
-    const handleInput = (input: string) => {
-      if (!input.length) return;
+      terminalRef.current = terminal;
+
+      terminal.loadAddon(fitAddon);
+      terminal.open(containerRef.current);
+      fitAddon.fit();
+      terminal.focus();
+
+      terminal.writeln("Connected to backend...");
+      terminal.write("> ");
+
+      selfHandleOutput(terminal);
+      selfHandleInput(terminal);
+    };
+
+    /** ---------- SELF: OUTPUT HANDLER ---------- */
+    const selfHandleOutput = (terminal: any) => {
+      const queue: string[] = [];
+      let running = false;
+
+      const flush = async () => {
+        if (running) return;
+        running = true;
+
+        while (queue.length > 0) {
+          terminal.write(queue.shift()!);
+          await new Promise(r => setTimeout(r, 1));
+        }
+
+        running = false;
+      };
+
+      setOnMessage((data: string) => {
+        queue.push(data);
+        flush();
+      });
+
+      setOnClose(() => {
+        terminal.write("\r\n[Program executed successfully]\r\n> ");
+      });
+    };
+
+    /** ---------- SELF: INPUT HANDLER ---------- */
+    const selfHandleInput = (terminal: any) => {
+      let buffer = "";
+
+      terminal.onData((data: string) => {
+        // ENTER
+        if (data === "\r") {
+          selfSend(buffer.trim(), terminal);
+          buffer = "";
+          terminal.write("\r\n> ");
+          return;
+        }
+
+        // BACKSPACE
+        if (data === "\u007F") {
+          if (buffer.length) {
+            buffer = buffer.slice(0, -1);
+            terminal.write("\b \b");
+          }
+          return;
+        }
+
+        buffer += data;
+        terminal.write(data);
+      });
+    };
+
+    /** ---------- SELF: SEND LOGIC ---------- */
+    const selfSend = (input: string, terminal: any) => {
+      if (!input) return;
 
       if (input === "clear") {
-        term.clear();
+        terminal.clear();
         return;
       }
 
@@ -99,26 +115,28 @@ export default function TerminalArea() {
 
       if (/^".*"$/.test(input)) {
         payload = { type: "string", value: input.slice(1, -1) };
-      } 
-      else if (/^-?\d+$/.test(input)) {
+      } else if (/^-?\d+$/.test(input)) {
         payload = { type: "number", value: Number(input) };
-      }
-      else {
+      } else {
         payload = { type: "string", value: input };
       }
 
       send(JSON.stringify(payload));
     };
 
-    return () => {
+    initTerminal();
 
-      term.dispose();
+    return () => {
+      disposed = true;
+      terminalRef.current?.dispose();
       terminalRef.current = null;
     };
-
   }, []);
 
   return (
-    <div ref={termRef} className="h-full w-full bg-black rounded text-gray-100" />
+    <div
+      ref={containerRef}
+      className="h-full w-full bg-black rounded text-gray-100"
+    />
   );
 }
