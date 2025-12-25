@@ -17,12 +17,12 @@ export default function Code() {
   const Languages = [
     
     "Cpp",
-    "Python",
-    "C#",
-    "Rust",
-    "Go",
-    "Javascript",
-    "TypeScript",
+    // "Python",
+    // "C#",
+    // "Rust",
+    // "Go",
+    // "Javascript",
+    // "TypeScript",
   ];
 
   const compile=async ()=>{
@@ -39,7 +39,7 @@ export default function Code() {
         })
         
           const id=res.data;
-          const wsUrl = base.replace("http", "ws")+`ws/compile?id=${id}`;
+          const wsUrl = base.replace("https", "wss")+`ws/compile?id=${id}`;
           connect(wsUrl,{
             onOpen:()=>{},
             onMessage:(m)=>{},

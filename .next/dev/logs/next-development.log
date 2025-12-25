@@ -1,10 +1,10 @@
-[00:00:01.205] Server  LOG      ✓ Ready in 881ms
-[00:00:06.349] Server  LOG      ○ Compiling / ...
-[00:05:23.895] Server  LOG        Reload env: .env
-[00:05:24.187] Server  LOG      ✓ Compiled in 86ms
-[00:20:06.084] Server  LOG        Reload env: .env
-[00:20:06.164] Server  LOG      ✓ Compiled in 40ms
-[00:20:07.946] Server  LOG        Reload env: .env
-[00:20:08.105] Server  LOG      ✓ Compiled in 28ms
-[00:20:09.210] Server  LOG        Reload env: .env
-[00:20:09.325] Server  LOG      ✓ Compiled in 27ms
+[00:00:01.784] Server  LOG      ✓ Ready in 1331ms
+[00:00:13.029] Server  LOG      ○ Compiling / ...
+[00:01:42.219] Server  LOG      ✓ Compiled in 28ms
+[00:10:36.714] Server  LOG      ✓ Compiled in 30ms
+[00:17:03.478] Browser ERROR   unhandledRejection: AxiosError: Request failed with status code 400
+[00:17:08.473] Browser ERROR   unhandledRejection: AxiosError: Request failed with status code 400
+[00:17:15.655] Browser ERROR   unhandledRejection: AxiosError: Request failed with status code 400
+[00:17:48.783] Browser ERROR   unhandledRejection: AxiosError: Request failed with status code 400
+[00:29:29.303] Server  LOG      ✓ Compiled in 32ms
+[00:29:50.321] Browser ERROR   unhandledRejection: AxiosError: Request failed with status code 400
