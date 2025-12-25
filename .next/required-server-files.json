@@ -99,7 +99,7 @@
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/home/ubantu/Desktop",
+    "outputFileTracingRoot": "/home/ubantu/Desktop/Project1/compiler",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -289,12 +289,12 @@
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "/home/ubantu/Desktop"
+      "root": "/home/ubantu/Desktop/Project1/compiler"
     },
     "distDirRoot": ".next"
   },
   "appDir": "/home/ubantu/Desktop/Project1/compiler",
-  "relativeAppDir": "Project1/compiler",
+  "relativeAppDir": "",
   "files": [
     ".next/routes-manifest.json",
     ".next/server/pages-manifest.json",
